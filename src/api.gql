@@ -1,0 +1,19 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type LanguageModel {
+  description: String!
+  id: ID!
+  name: String!
+}
+
+type Mutation {
+  addLanguage(description: String!, id: String!, name: String!): LanguageModel!
+  deleteLanguage(id: String!): Boolean!
+  updateLanguage(description: String!, id: String!, name: String!): LanguageModel!
+}
+
+type Query {
+  getLanguages: [LanguageModel!]!
+}
