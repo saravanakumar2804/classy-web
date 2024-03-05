@@ -1,0 +1,8 @@
+{
+  "name": "guest",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/web/guest/src",
+  "projectType": "application",
+  "targets": {},
+  "tags": []
+}
