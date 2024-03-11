@@ -6,8 +6,9 @@ import {
   HomeOutlined,
   PoweroffOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Button, theme,Popover} from 'antd';
+import { Layout, Menu, Button, theme, Popover } from 'antd';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { getAuth, signOut } from 'firebase/auth';
 
 const Home: React.FC = () => {
   const { Header, Sider, Content } = Layout;
@@ -18,14 +19,22 @@ const Home: React.FC = () => {
   const navigateToLogOut = useNavigate();
 
   const Logout = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+      })
+      .catch((error) => {
+      });
+
     navigateToLogOut('/');
   };
- 
-const Logout_hover = (
-  <div>
-    <p>Logout</p>
-  </div>
-);
+
+  const Logout_hover = (
+    <div>
+      <p>Logout</p>
+    </div>
+  );
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>

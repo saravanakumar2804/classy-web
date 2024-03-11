@@ -4,16 +4,41 @@
 
 type LanguageModel {
   description: String!
-  id: ID!
+  id: String!
   name: String!
 }
 
 type Mutation {
-  addLanguage(description: String!, id: String!, name: String!): LanguageModel!
-  deleteLanguage(id: String!): Boolean!
-  updateLanguage(description: String!, id: String!, name: String!): LanguageModel!
+  createLanguage(languageDto: languageDTO!): LanguageModel!
+  createUsers(input: userDTO!): User!
 }
 
 type Query {
   getLanguages: [LanguageModel!]!
+  getSteps: [StepsModel!]!
+  getUsers: [User!]!
+}
+
+type StepsModel {
+  description: String!
+  id: ID!
+  name: String!
+}
+
+type User {
+  email: String!
+  id: ID!
+  mobileNumber: String!
+  name: String!
+}
+
+input languageDTO {
+  description: String!
+  name: String!
+}
+
+input userDTO {
+  email: String!
+  mobileNumber: String!
+  name: String!
 }

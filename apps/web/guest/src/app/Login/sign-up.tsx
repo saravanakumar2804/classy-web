@@ -7,17 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { app } from '../FireBase/firebase.config';
 
-interface FormProps {
-  onFormSubmit: () => void;
-}
-
-const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
+const Sign_up: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
+    contactName: '',
     email: '',
     password: '',
-    conformPassword: '',
+    confirmPassword: '',
     mobileNumber: '',
   });
 
@@ -27,12 +23,14 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      email: value,
     });
   };
   const onRegisterSubmit = async () => {
     const auth = getAuth(app);
-  
+    console.log(formData, 'Formdata');
+    // return;
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -42,12 +40,12 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
       const user = userCredential.user;
       console.log('User registered:', user);
       navigate('/Home');
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error registering user:', error.message);
     }
   };
-  
-  const handlePhoneChange = (value: string, data: any, event: any) => {
+
+  const handlePhoneChange = (value: string) => {
     setFormData({
       ...formData,
       mobileNumber: value,
@@ -63,15 +61,23 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
         style={{ maxWidth: 600 }}
         initialValues={{ remember: true }}
         autoComplete="off"
-        className='register_form'
+        className="register_form"
         onFinish={onRegisterSubmit}
       >
         <Form.Item
           label="Name"
-          name="name"
+          name="contactName"
           rules={[{ required: true, message: 'Please Enter your username!' }]}
         >
-          <Input value={formData.name} onChange={handleChange} />
+          <Input
+            value={formData.contactName}
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                contactName: e.target.value,
+              });
+            }}
+          />
         </Form.Item>
 
         <Form.Item
@@ -79,7 +85,15 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
           name="email"
           rules={[{ required: true, message: 'Enter Your email' }]}
         >
-          <Input value={formData.email} onChange={handleChange} />
+          <Input
+            value={formData.email}
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                email: e.target.value,
+              });
+            }}
+          />
         </Form.Item>
         <Form.Item
           name="password"
@@ -92,7 +106,12 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
           ]}
           hasFeedback
         >
-          <Input.Password />
+          <Input.Password onChange={(e) => {
+            setFormData({
+              ...formData,
+              password: e.target.value,
+            })
+          }}/>
         </Form.Item>
 
         <Form.Item
@@ -117,7 +136,12 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
             }),
           ]}
         >
-          <Input.Password />
+          <Input.Password onChange={(e) => {
+            setFormData({
+              ...formData,
+              confirmPassword: e.target.value,
+            })
+          }}/>
         </Form.Item>
         <Form.Item
           label="Mobile Number"
@@ -136,7 +160,7 @@ const Sign_up: React.FC<FormProps> = ({ onFormSubmit }) => {
           />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" onClick={onRegisterSubmit}>
             Register
           </Button>
         </Form.Item>

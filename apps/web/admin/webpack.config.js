@@ -1,13 +1,14 @@
 const { NxWebpackPlugin } = require('@nx/webpack');
 const { NxReactWebpackPlugin } = require('@nx/react');
 const { join } = require('path');
-
 module.exports = {
   output: {
     path: join(__dirname, '../../../dist/apps/web/admin'),
+    publicPath:"/"
   },
   devServer: {
     port: 4200,
+    historyApiFallback: true,
   },
   plugins: [
     new NxWebpackPlugin({

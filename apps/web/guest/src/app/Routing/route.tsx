@@ -4,23 +4,22 @@ import Home from '../Home-Page/home-page';
 import Language from '../Home-Page/Language/language';
 import Sign_in from '../Login/sign-in';
 import Sign_up from '../Login/sign-up';
+import PrivateRoute from './privateRouting';
 
 const AppRouting: React.FC = () => {
-    // console.log("Hey buddy1");
-
+const isAuthenticated = true;
     return (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Sign_in />} />
-          <Route path="/Sign_up" element={<Sign_up onFormSubmit={function (): void {
-            throw new Error('Function not implemented.');
-          } } />} />
-          <Route path="/Home" element = {<Home />}>
-            <Route path="/Home/Language" element = {<Language />}/>
-            
-
-          </Route>
-          </Routes>
+          <Route path="/Sign_up" element={<Sign_up />} />
+          <Route
+          path="/Home"
+          element={<PrivateRoute isAuthenticated={isAuthenticated} />}
+        >
+          <Route path="Language" element={<Language />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 };

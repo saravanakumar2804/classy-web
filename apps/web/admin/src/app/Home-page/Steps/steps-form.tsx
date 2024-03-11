@@ -1,24 +1,27 @@
-import React, { useState } from "react";
-import { Button, Form, Input, Modal, Menu, Dropdown } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { DataType } from "./steps";
-import { CREATE_STEPS } from "./query";
-import { useMutation } from "@apollo/client";
+import React, { useState } from 'react';
+import { Button, Form, Input, Modal, Menu, Dropdown } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { DataType } from './steps';
+import { CREATE_STEPS } from './query';
+import { useMutation } from '@apollo/client';
 
 interface FormProps {
   onFormSubmit: (formData: DataType) => void;
 }
 
 const Steps_form: React.FC<FormProps> = ({ onFormSubmit }) => {
+  const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    select_language: "", // Added a state for language selection
+    name: '',
+    description: '',
+    select_language: '', // Added a state for language selection
   });
   const [createSteps] = useMutation(CREATE_STEPS);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -50,24 +53,25 @@ const Steps_form: React.FC<FormProps> = ({ onFormSubmit }) => {
       if (data && data.createSteps) {
         onFormSubmit(data.createSteps);
       } else {
-        console.error("Error creating steps. Data or createSteps is undefined.");
+        console.error(
+          'Error creating steps. Data or createSteps is undefined.'
+        );
       }
     } catch (error) {
-      console.error("Error creating Steps: " + error);
+      console.error('Error creating Steps: ' + error);
     }
-    setFormData({ name: "", description: "", select_language: "" });
+    form.resetFields();
     setModalVisible(false);
   };
 
   const languageMenu = (
     <Menu>
-      <Menu.Item key="english" onClick={() => handleLanguageSelect("English")}>
+      <Menu.Item key="english" onClick={() => handleLanguageSelect('English')}>
         English
       </Menu.Item>
-      <Menu.Item key="spanish" onClick={() => handleLanguageSelect("Spanish")}>
+      <Menu.Item key="spanish" onClick={() => handleLanguageSelect('Spanish')}>
         Spanish
       </Menu.Item>
-      {/* Add more language items as needed */}
     </Menu>
   );
 
@@ -76,7 +80,12 @@ const Steps_form: React.FC<FormProps> = ({ onFormSubmit }) => {
       <Button className="Steps_Btn" onClick={showModal}>
         <PlusOutlined />
       </Button>
-      <Modal open={modalVisible} footer={[]} closable={false} onCancel={() => setModalVisible(false)}>
+      <Modal
+        open={modalVisible}
+        footer={[]}
+        closable={false}
+        onCancel={() => setModalVisible(false)}
+      >
         <Form
           name="basic"
           labelCol={{ span: 6 }}
@@ -89,22 +98,39 @@ const Steps_form: React.FC<FormProps> = ({ onFormSubmit }) => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please Enter your username!" }]}
+            rules={[{ required: true, message: 'Please Enter your Name!' }]}
           >
-            <Input value={formData.name} onChange={handleChange} />
+            <Input
+              value={formData.name}
+              onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  name: e.target.value,
+                });
+              }}
+            />
           </Form.Item>
 
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Add Description" }]}
+            rules={[{ required: true, message: 'Add Description' }]}
           >
-            <textarea className="formText" value={formData.description} onChange={handleChange} />
+            <textarea
+              className="formText"
+              value={formData.description}
+              onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  description: e.target.value,
+                });
+              }}
+            />
           </Form.Item>
 
           <Form.Item label="Select Language" name="select_language">
-            <Dropdown overlay={languageMenu} trigger={["click"]}>
-              <Button>{formData.select_language || "Select Language"}</Button>
+            <Dropdown overlay={languageMenu} trigger={['click']}>
+              <Button>{formData.select_language || 'Select Language'}</Button>
             </Dropdown>
           </Form.Item>
 

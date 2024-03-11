@@ -13,34 +13,6 @@ export interface DataType {
   action: string;
 }
 
-const columns: TableColumnsType<DataType> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Mobile Number',
-    dataIndex: 'mobileNumber',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Action',
-    dataIndex: 'action',
-    render: (text: string, record: DataType) => (
-      <div>
-        <Button>Edit</Button>
-        <br />
-        <Button>Delete</Button>
-      </div>
-    ),
-  },
-];
 
 const Users: React.FC = () => {
   const { data } = useQuery(GetUsers);
@@ -54,6 +26,34 @@ const Users: React.FC = () => {
     setTableData(newData);
   };
 
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      render: (text: string) => <a>{text}</a>,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      render: (text: string) => <a>{text}</a>,
+    },
+    {
+      title: 'Mobile Number',
+      dataIndex: 'mobileNumber',
+      render: (text: string) => <a>{text}</a>,
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (text: string, record: DataType) => (
+        <div>
+          <Button>Edit</Button>
+          <br />
+          <Button>Delete</Button>
+        </div>
+      ),
+    },
+  ];
   return (
     <div>
       <Divider />

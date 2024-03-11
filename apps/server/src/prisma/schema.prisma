@@ -4,13 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
-model Language {
-  id    String  @id  @map("_id")
-  name  String?
-  description String  
-}
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,4 +11,23 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = "mongodb+srv://saravanamani2804:9MdjoO9pcfNN8UzO@sample.eliifx4.mongodb.net/sample"
+}
+
+model Language {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String
+}
+
+model Steps {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String
+}
+
+model users {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  email        String
+  mobileNumber String
 }

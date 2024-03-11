@@ -19,7 +19,10 @@ const Home: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigateToLogOut = useNavigate();
-
+  
+  const NavigateToContent = () => {
+    navigateToLogOut('/Home')
+  }
   const Logout = () => {
     navigateToLogOut('/');
   };
@@ -58,7 +61,7 @@ const Home: React.FC = () => {
           <Button
             type="text"
             icon={<HomeOutlined />}
-            // onClick={() => NavigateToContent()}
+             onClick={() => NavigateToContent()}
             style={{
               fontSize: '16px',
               width: 30,

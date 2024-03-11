@@ -10,8 +10,8 @@ query GetLanguages {
   }
   `;
 export const CREATE_STEPS = gql`
-mutation createLanguage($name: String!, $description: String!) {
-    createLanguage(input:{ name: $name, description: $description}) {
+mutation CreateSteps($name: String!, $description: String!) {
+  createSteps(input:{ name: $name, description: $description}) {
         id 
         name
         description

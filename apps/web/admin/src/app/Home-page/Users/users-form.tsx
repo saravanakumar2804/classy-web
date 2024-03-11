@@ -13,6 +13,7 @@ interface FormProps {
 
 
 const Users_form: React.FC<FormProps> = ({onFormSubmit}) => {
+  const [form] = Form.useForm()
     const [modalVisible, setModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -46,7 +47,7 @@ const Users_form: React.FC<FormProps> = ({onFormSubmit}) => {
   } catch (error) {
     console.error("Error creating Users: "+ error);
   }
-  setFormData({ name: " ", email: " ", mobileNumber: " " });
+  form.resetFields();
   setModalVisible(false);
  
 };
@@ -76,9 +77,14 @@ const handlePhoneChange = (value: string, data: any, event: any) => {
           <Form.Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: "Please Enter your username!" }]}
+            rules={[{ required: true, message: "Please Enter your Name!" }]}
           >
-            <Input value={formData.name} onChange={handleChange} />
+            <Input value={formData.name}  onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  name: e.target.value,
+                });
+              }} />
           </Form.Item>
 
           <Form.Item
@@ -86,7 +92,12 @@ const handlePhoneChange = (value: string, data: any, event: any) => {
             name="email"
             rules={[{ required: true, message: "Enter Your email" }]}
           >
-           <Input value={formData.email} onChange={handleChange} />
+           <Input value={formData.email} 
+           onChange={(e) => {
+            setFormData({
+              ...formData,
+            })
+           }} />
           </Form.Item> 
           <Form.Item
             label="Mobile Number"
