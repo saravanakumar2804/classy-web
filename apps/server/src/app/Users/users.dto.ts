@@ -10,4 +10,7 @@ export class userDTO {
 
   @Field()
   mobileNumber: string;
+
+  @Field()
+  uid: string;
 }

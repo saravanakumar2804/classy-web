@@ -1,64 +1,136 @@
 import React, { useState } from 'react';
-import { Button, Divider, Table } from 'antd';
-import type { TableColumnsType } from 'antd';
-import Language_form from './lang-form';
-import { useQuery } from '@apollo/client';
-import { GetLanguages } from './query';
+import { Table, Modal, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import MyForm from './lang-form';
 
-export interface DataType {
-  key: React.Key;
-  name: string;
-  description: string;
-  action: string;
-}
-
-const columns: TableColumnsType<DataType> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Action',
-    dataIndex: 'action',
-    render: (text: string, record: DataType) => (
-      <div>
-        <Button>Edit</Button>
-        <br />
-        <Button>Delete</Button>
-      </div>
-    ),
-  },
-];
+import { useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { IMutation, IQuery, LanguageModel } from '../../graphql';
+import { ColumnsType } from 'antd/es/table';
+import {
+  createLanguageTable,
+  deleteLanguage,
+  GetLanguages,
+  updateLanguage,
+} from './query';
 
 const Language: React.FC = () => {
-  const { data } = useQuery(GetLanguages);
-  console.log(data?.getLanguages, 'languages');
-  const [tabledata, setTableData] = useState<DataType[]>([]);
-  const handleFormSubmit = (formData: DataType) => {
-    const newData: DataType[] = [
-      ...tabledata,
-      { ...formData, key: Date.now() },
-    ];
-    setTableData(newData);
-  };
+  const client = useApolloClient();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<LanguageModel | null>(
+    null
+  );
+  const { data } = useQuery<IQuery>(GetLanguages);
+  const getLanguagesInfo = data?.getLanguages;
+  const [createLanguageMutation] = useMutation<IMutation>(createLanguageTable);
+  const [updateLanguageMutation] = useMutation(updateLanguage);
+  const [deleteLanguageMutation] = useMutation(deleteLanguage);
 
+  const columns: ColumnsType<LanguageModel> = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text: string, record: LanguageModel) => (
+        <span>
+          <a onClick={() => handleEdit(record)}>Edit</a>
+          <span style={{ margin: '0 8px' }}>|</span>
+          <a onClick={() => handleDelete(record)}>Delete</a>
+        </span>
+      ),
+    },
+  ];
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setEditingRecord(null);
+  };
+  const addDataToTable = async (newData: LanguageModel) => {
+    if (editingRecord) {
+      await updateLanguageMutation({
+        variables: {
+          updateLanguageId: editingRecord.id,
+          description: newData.description,
+          name: newData.name,
+        },
+        refetchQueries: [{ query: GetLanguages }],
+      });
+    } else {
+      const { data } = await createLanguageMutation({
+        variables: {
+          languageDto: { name: newData.name, description: newData.description },
+        },
+        refetchQueries: [{ query: GetLanguages }],
+      });
+      if (data) {
+        const existingData = client.readQuery({ query: GetLanguages }) as {
+          trial?: LanguageModel[];
+        };
+        const newLanguage = data.createLanguage;
+        const updatedData = {
+          trial: existingData?.trial
+            ? [...existingData.trial, newLanguage]
+            : [newLanguage],
+        };
+        client.writeQuery({
+          query: GetLanguages,
+          data: updatedData,
+        });
+      }
+    }
+    setIsModalVisible(false);
+    setEditingRecord(null);
+  };
+  const handleEdit = (record: LanguageModel) => {
+    setEditingRecord(record);
+    showModal();
+  };
+  const handleDelete = async (record: LanguageModel) => {
+    console.log(record);
+    await deleteLanguageMutation({
+      variables: { deleteLanguageId: record.id },
+      refetchQueries: [{ query: GetLanguages }],
+    });
+  };
   return (
-    <div>
-      <Divider />
-      <Language_form onFormSubmit={handleFormSubmit} />
-      <Table
-        className="Language_Table"
-        columns={columns}
-        dataSource={tabledata || []}
-      />
-    </div>
+    <>
+      <div>
+        <Button className="Lang_Btn" onClick={showModal}>
+          <PlusOutlined />
+        </Button>
+      </div>
+      <br />
+      <Modal
+        title={editingRecord ? 'Edit Language' : 'Add Language'}
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <MyForm
+          onCancel={handleCancel}
+          //  type={Testing?.STEPS}
+          addDataToTable={addDataToTable}
+          editingRecord={editingRecord}
+          onDelete={handleDelete}
+          //  isStepForm={false}
+        />
+      </Modal>
+      <Table columns={columns} dataSource={getLanguagesInfo} />
+    </>
   );
 };
-
 export default Language;

@@ -1,117 +1,99 @@
-import React, { useState } from 'react';
-import { Button, Form, Input, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { DataType } from './language';
-import { CREATE_LANGUAGE } from './query';
-import { useMutation } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-interface FormProps {
-  onFormSubmit: (formData: DataType) => void;
+import { LanguageModel } from '../../graphql';
+
+const { confirm } = Modal;
+interface MyFormProps<T> {
+  onCancel: () => void;
+  // type: Testing | undefined;
+  addDataToTable: (newData: T) => Promise<void>;
+  editingRecord: T | null;
+  onDelete: (record: T) => Promise<void>;
+  // isStepForm: boolean;
 }
-
-const Language_form: React.FC<FormProps> = ({ onFormSubmit }) => {
+const MyForm: React.FC<MyFormProps<LanguageModel>> = ({
+  onCancel,
+  addDataToTable,
+  editingRecord,
+  onDelete,
+}) => {
   const [form] = Form.useForm();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-  });
-  const [createLanguage] = useMutation(CREATE_LANGUAGE);
-
-  // const handleChange = (
-  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  // ) => {
-  //   const { name, value } = e.target;
-  //   setFormData({
-  //     ...formData,
-  //     [name]: value,
-  //   });
-  // };
-  const showModal = () => {
-    setModalVisible(true);
-  };
-
-  const handleFormSubmit = async () => {
-    try {
-      const { data } = await createLanguage({
-        variables: { name: formData.name, description: formData.description },
+  const [isDeleteConfirmation, setDeleteConfirmation] = useState(false);
+  useEffect(() => {
+    if (editingRecord) {
+      form.setFieldsValue({
+        name: editingRecord.name,
+        description: editingRecord.description,
       });
-
-      if (data && data.createLanguage) {
-        onFormSubmit(data.createLanguage);
-      } else {
-        console.error(
-          'Error creating language. Data or createLanguage is undefined.'
-        );
-      }
-    } catch (error) {
-      console.error('Error creating language: ' + error);
     }
+  }, [editingRecord, form]);
+  const onFinish = async () => {
+    const values = await form.validateFields();
+    console.log('Submitted values:', values);
+    const newData = {
+      name: values.name,
+      description: values.description,
+    };
+    addDataToTable(newData as unknown as LanguageModel);
+    onCancel(); // Close the modal after submitting the form
     form.resetFields();
-    setModalVisible(false);
   };
-
+  const showDeleteConfirmation = () => {
+    confirm({
+      title: 'Do you want to delete this record ?',
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        if (editingRecord) {
+          onDelete(editingRecord);
+          onCancel();
+          form.resetFields();
+        }
+      },
+      onCancel() {
+        setDeleteConfirmation(false);
+      },
+    });
+  };
   return (
-    <div>
-      <Button className="Lang_Btn" onClick={showModal}>
-        <PlusOutlined />
-      </Button>
-      <Modal
-        open={modalVisible}
-        footer={[]}
-        closable={false}
-        onCancel={() => setModalVisible(false)}
+    <Form
+      form={form}
+      name="myForm"
+      initialValues={{ name: '', description: '' }}
+      onFinish={onFinish}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 16 }}
+      style={{ maxWidth: 600 }}
+    >
+      <Form.Item
+        label="Name"
+        name="name"
+        rules={[{ required: true, message: 'Please enter a name!' }]}
       >
-        <Form
-          name="basic"
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          initialValues={{ remember: true }}
-          autoComplete="off"
-          onFinish={handleFormSubmit}
-        >
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: 'Please input your username!' }]}
-          >
-            <Input
-              value={formData.name}
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  name: e.target.value,
-                });
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[{ required: true, message: 'Add Description' }]}
-          >
-            <textarea
-              className="formText"
-              value={formData.description}
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  description: e.target.value,
-                });
-              }}
-            />
-          </Form.Item>
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label="Description"
+        name="description"
+        rules={[{ required: true, message: 'Please enter a description!' }]}
+      >
+        <Input.TextArea />
+      </Form.Item>
+      <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+      <Modal
+        title="Confirmation"
+        open={isDeleteConfirmation}
+        onOk={() => showDeleteConfirmation()}
+        onCancel={() => setDeleteConfirmation(false)} // Set visible to false on cancel
+      >
+        <p>Are you Sure you Want to Delete this Record ?</p>
       </Modal>
-    </div>
+    </Form>
   );
 };
-
-export default Language_form;
+export default MyForm;

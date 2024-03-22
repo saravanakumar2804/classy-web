@@ -12,5 +12,4 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated }) => {
   return isAuthenticated ? <Home /> : <Navigate to="/" replace={true} />;
 };
 
-
 export default PrivateRoute;

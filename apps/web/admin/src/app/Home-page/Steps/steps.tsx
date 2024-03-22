@@ -1,64 +1,123 @@
 import React, { useState } from 'react';
-import { Button, Divider, Table } from 'antd';
-import type { TableColumnsType } from 'antd';
-import Steps_form from './steps-form';
-import { useQuery } from '@apollo/client';
-import { GetSteps } from './query';
-
-export interface DataType {
-  key: React.Key;
-  name: string;
-  description: string;
-  action: string;
-}
-
-const columns: TableColumnsType<DataType> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: 'Action',
-    dataIndex: 'action',
-    render: (text: string, record: DataType) => (
-      <div>
-        <Button>Edit</Button>
-        <br />
-        <Button>Delete</Button>
-      </div>
-    ),
-  },
-];
+import { Table, Modal, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery } from '@apollo/client';
+import { IMutation, IQuery, StepsModel, stepsDTO } from '../../graphql';
+import { createStepsTable, deleteSteps, GetSteps, updateSteps } from './query';
+import StepsForm from './steps-form';
 
 const Steps: React.FC = () => {
-  const { data } = useQuery(GetSteps);
-  console.log(data?.getSteps, 'steps');
-  const [tabledata, setTableData] = useState<DataType[]>([]);
-  const handleFormSubmit = (formData: DataType) => {
-    const newData: DataType[] = [
-      ...tabledata,
-      { ...formData, key: Date.now() },
-    ];
-    setTableData(newData);
-  };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<StepsModel | null>(null);
+  const { data } = useQuery<IQuery>(GetSteps);
+  const getStepsInfo = data?.getSteps;
+  const [createStepsMutation] = useMutation<IMutation>(createStepsTable);
+  const [updateStepsMutation] = useMutation(updateSteps);
+  const [deleteStepsMutation] = useMutation(deleteSteps);
 
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text: string, record: StepsModel) => (
+        <span>
+          <a onClick={() => handleEdit(record)}>Edit</a>
+          <span style={{ margin: '0 8px' }}>|</span>
+          <a onClick={() => handleDelete(record)}>Delete</a>
+        </span>
+      ),
+    },
+  ];
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setEditingRecord(null);
+  };
+  const addDataToTable = async (newData: StepsModel) => {
+    if (editingRecord) {
+      await updateStepsMutation({
+        variables: {
+          updateStepsId: editingRecord.id,
+          name: newData.name,
+          description: newData.description,
+        },
+        refetchQueries: [{ query: GetSteps }],
+      });
+    } else {
+      await createStepsMutation({
+        variables: {
+          stepsDto: {
+            name: newData.name,
+            description: newData.description,
+            languageId: newData.languageId,
+          },
+        },
+        refetchQueries: [{ query: GetSteps }],
+        update: (cache, { data }) => {
+          const newSteps = data?.createSteps;
+          cache.modify({
+            fields: {
+              getSteps(existingSteps = []) {
+                return [...existingSteps, newSteps];
+              },
+            },
+          });
+        },
+      });
+    }
+    setIsModalVisible(false);
+    setEditingRecord(null);
+  };
+  const handleEdit = (record: StepsModel) => {
+    setEditingRecord(record);
+    showModal();
+  };
+  const handleDelete = async (record: StepsModel) => {
+    console.log(record);
+    await deleteStepsMutation({
+      variables: { deleteStepsId: record.id },
+      refetchQueries: [{ query: GetSteps }],
+    });
+  };
   return (
-    <div>
-      <Divider />
-      <Steps_form onFormSubmit={handleFormSubmit} />
-      <Table
-        className="Steps_Table"
-        columns={columns}
-        dataSource={tabledata || []}
-      />
-    </div>
+    <>
+      <div>
+        <Button className="Steps_Btn" onClick={showModal}>
+          <PlusOutlined />
+        </Button>
+      </div>
+      <br />
+      <Modal
+        title={editingRecord ? 'Edit Steps' : 'Add Steps'}
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <StepsForm
+          onCancel={handleCancel}
+          addDataToTable={addDataToTable}
+          editingRecord={editingRecord}
+          onDelete={handleDelete}
+        />
+      </Modal>
+      <Table columns={columns} dataSource={getStepsInfo} />
+    </>
   );
 };
-
 export default Steps;

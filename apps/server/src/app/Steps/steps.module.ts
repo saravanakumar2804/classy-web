@@ -5,6 +5,6 @@ import { StepsService } from './steps.service';
 
 @Module({
   imports: [PrismaModule],
-  providers: [StepsResolver, StepsService]
+  providers: [StepsResolver, StepsService],
 })
 export class StepsModule {}

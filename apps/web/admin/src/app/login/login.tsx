@@ -54,13 +54,13 @@ const Login: React.FC = () => {
 
         <Form.Item>
           <Link to={'/Home'}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="login-form-button"
-          >
-            Log in
-          </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
+            >
+              Log in
+            </Button>
           </Link>
         </Form.Item>
       </Form>

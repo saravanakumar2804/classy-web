@@ -9,8 +9,15 @@ type LanguageModel {
 }
 
 type Mutation {
-  createLanguage(languageDto: languageDTO!): LanguageModel!
-  createUsers(input: userDTO!): User!
+  createLanguage(languageDTO: languageDTO!): LanguageModel!
+  createSteps(stepsDTO: stepsDTO!): StepsModel!
+  createUsers(userDTO: userDTO!): User!
+  deleteLanguage(id: String!): Boolean!
+  deleteSteps(id: String!): Boolean!
+  deleteUsers(id: String!): Boolean!
+  updateLanguage(description: String!, id: String!, name: String!): LanguageModel!
+  updateSteps(description: String!, id: String!, name: String!): StepsModel!
+  updateUsers(id: String!, userDTO: userDTO!): User!
 }
 
 type Query {
@@ -30,9 +37,15 @@ type User {
   id: ID!
   mobileNumber: String!
   name: String!
+  uid: String
 }
 
 input languageDTO {
+  description: String!
+  name: String!
+}
+
+input stepsDTO {
   description: String!
   name: String!
 }
@@ -41,4 +54,5 @@ input userDTO {
   email: String!
   mobileNumber: String!
   name: String!
+  uid: String!
 }

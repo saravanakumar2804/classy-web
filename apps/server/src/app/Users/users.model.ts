@@ -13,4 +13,7 @@ export class usersModel {
 
   @Field()
   mobileNumber: string;
+
+  @Field({nullable:true})
+  uid: string;
 }

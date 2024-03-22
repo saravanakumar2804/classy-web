@@ -5,6 +5,6 @@ import { PrismaModule } from '../../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],
-  providers: [LanguageResolver, LanguageService]
+  providers: [LanguageResolver, LanguageService],
 })
 export class LanguageModule {}

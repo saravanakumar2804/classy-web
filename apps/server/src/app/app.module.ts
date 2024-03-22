@@ -9,7 +9,13 @@ import { usersModule } from './Users/users.module';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [GraphQlModule,LanguageModule,StepsModule,usersModule,PrismaModule],
+  imports: [
+    GraphQlModule,
+    LanguageModule,
+    StepsModule,
+    usersModule,
+    PrismaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

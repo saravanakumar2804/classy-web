@@ -1,15 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import AppRouting from './Routing/route';
-import styles from './app.module.less';
-import Login from './login/login';
+import { firebaseConfig } from './firebase/firebase.config';
+import { FirebaseLoginService } from './firebase';
 
 
 export function App() {
- 
-  
+  new FirebaseLoginService().initialize(firebaseConfig);
+
   return (
     <div>
-      <AppRouting/>
+      <AppRouting />
     </div>
   );
 }

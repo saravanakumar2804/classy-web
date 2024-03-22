@@ -4,33 +4,30 @@ import { LanguageService } from './language.service';
 import { languageDTO } from './language.dto';
 
 @Resolver(() => LanguageModel)
-
 export class LanguageResolver {
-    constructor(private  languageService: LanguageService) {}
+  constructor(private languageService: LanguageService) {}
 
-    @Query(() => [LanguageModel])
-    async getLanguages(): Promise<LanguageModel[]> {
-      return this.languageService.getLanguages();
-    }
-  
-    @Mutation(() => LanguageModel)
-    async createLanguage(
-      @Args('languageDto') languageDto: languageDTO,
-    ){
-      return this.languageService.createLanguage(languageDto);
-    }
-  
-    // @Mutation(() => LanguageModel)
-    // async updateLanguage(
-    //   @Args('id') id: string,
-    //   @Args('name') name: string,
-    //   @Args('description') description: string,
-    // ): Promise<LanguageModel> {
-    //   return this.languageService.updateLanguage(id, name, description);
-    // }
-  
-    // @Mutation(() => Boolean)
-    // async deleteLanguage(@Args('id') id: string): Promise<boolean> {
-    //   return this.languageService.deleteLanguage(id);
-    // }
+  @Query(() => [LanguageModel])
+  async getLanguages(): Promise<LanguageModel[]> {
+    return this.languageService.getLanguages();
+  }
+
+  @Mutation(() => LanguageModel)
+  async createLanguage(@Args('languageDTO') languageDTO: languageDTO) {
+    return this.languageService.createLanguage(languageDTO);
+  }
+
+  @Mutation(() => LanguageModel)
+  async updateLanguage(
+    @Args('id') id: string,
+    @Args('name') name: string,
+    @Args('description') description: string
+  ): Promise<LanguageModel> {
+    return this.languageService.updateLanguage(id, name, description);
+  }
+
+  @Mutation(() => Boolean)
+  async deleteLanguage(@Args('id') id: string): Promise<boolean> {
+    return this.languageService.deleteLanguage(id);
+  }
 }

@@ -1,11 +1,10 @@
-import {  createHttpLink } from "@apollo/client";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
-
+import { createHttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:5200/graphql",
-  credentials: 'include', 
+  uri: 'http://localhost:5200/graphql',
+  credentials: 'include',
 });
 const apolloError = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
@@ -23,7 +22,7 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: "cache-first",
+      fetchPolicy: 'cache-first',
     },
   },
 });

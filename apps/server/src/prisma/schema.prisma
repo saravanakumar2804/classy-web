@@ -30,4 +30,5 @@ model users {
   name         String?
   email        String
   mobileNumber String
+  uid          String?
 }

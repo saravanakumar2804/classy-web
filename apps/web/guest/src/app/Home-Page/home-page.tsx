@@ -13,6 +13,7 @@ import { getAuth, signOut } from 'firebase/auth';
 const Home: React.FC = () => {
   const { Header, Sider, Content } = Layout;
   const [collapsed, setCollapsed] = useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -22,9 +23,10 @@ const Home: React.FC = () => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
-        // Sign-out successful.
+        console.log('succesfully signed Out.');
       })
       .catch((error) => {
+        console.error('Error signing out:', error.message);
       });
 
     navigateToLogOut('/');

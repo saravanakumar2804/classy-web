@@ -1,47 +1,46 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, Modal } from 'antd';
-import { useMutation } from '@apollo/client';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { app } from '../FireBase/firebase.config';
+import { userDTO } from 'apps/web/admin/src/app/graphql';
+import { getAuth, createUserWithEmailAndPassword,  UserCredential } from 'firebase/auth';
+import { useMutation } from '@apollo/client';
+import { createUsersTable } from './query';
 
 const Sign_up: React.FC = () => {
   const navigate = useNavigate();
+  const Auth = getAuth();
+  const [createUser] = useMutation(createUsersTable)
   const [formData, setFormData] = useState({
-    contactName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
     mobileNumber: '',
   });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      email: value,
-    });
-  };
   const onRegisterSubmit = async () => {
-    const auth = getAuth(app);
-    console.log(formData, 'Formdata');
-    // return;
-
+    // console.log(formData, 'Formdata');
+  
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      const user = userCredential.user;
-      console.log('User registered:', user);
+      const usercredential: UserCredential = await createUserWithEmailAndPassword(Auth, formData.email, formData.password)
+      const userDto = {
+        name: formData.name,
+        email: formData.email,
+        mobileNumber: formData.mobileNumber,
+        uid:usercredential?.user?.uid,
+      };
+      // console.log('User registered:', userDto);
       navigate('/Home');
-    } catch (error: any) {
-      console.error('Error registering user:', error.message);
+      await createUser({
+        variables:{
+          userDto: userDto
+        },
+        refetchQueries:[{query: createUsersTable}]
+      })
+    } catch (error) {
+      // Handle errors here
+      console.error('Registration failed:', error);
     }
   };
 
@@ -66,15 +65,15 @@ const Sign_up: React.FC = () => {
       >
         <Form.Item
           label="Name"
-          name="contactName"
+          name="name"
           rules={[{ required: true, message: 'Please Enter your username!' }]}
         >
           <Input
-            value={formData.contactName}
+            value={formData.name}
             onChange={(e) => {
               setFormData({
                 ...formData,
-                contactName: e.target.value,
+                name: e.target.value,
               });
             }}
           />
@@ -106,12 +105,14 @@ const Sign_up: React.FC = () => {
           ]}
           hasFeedback
         >
-          <Input.Password onChange={(e) => {
-            setFormData({
-              ...formData,
-              password: e.target.value,
-            })
-          }}/>
+          <Input.Password
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                password: e.target.value,
+              });
+            }}
+          />
         </Form.Item>
 
         <Form.Item
@@ -136,12 +137,14 @@ const Sign_up: React.FC = () => {
             }),
           ]}
         >
-          <Input.Password onChange={(e) => {
-            setFormData({
-              ...formData,
-              confirmPassword: e.target.value,
-            })
-          }}/>
+          <Input.Password
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                confirmPassword: e.target.value,
+              });
+            }}
+          />
         </Form.Item>
         <Form.Item
           label="Mobile Number"

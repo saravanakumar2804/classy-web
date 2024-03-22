@@ -19,10 +19,10 @@ const Home: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigateToLogOut = useNavigate();
-  
+
   const NavigateToContent = () => {
-    navigateToLogOut('/Home')
-  }
+    navigateToLogOut('/Home');
+  };
   const Logout = () => {
     navigateToLogOut('/');
   };
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
           <Button
             type="text"
             icon={<HomeOutlined />}
-             onClick={() => NavigateToContent()}
+            onClick={() => NavigateToContent()}
             style={{
               fontSize: '16px',
               width: 30,
@@ -72,9 +72,7 @@ const Home: React.FC = () => {
           />
           <Button
             type="text"
-            icon={<PoweroffOutlined 
-              className='Logout_btn'
-              />}
+            icon={<PoweroffOutlined className="Logout_btn" />}
             onClick={() => Logout()}
             style={{
               fontSize: '16px',
@@ -84,7 +82,7 @@ const Home: React.FC = () => {
               float: 'right',
               margin: 10,
             }}
-          />          
+          />
         </Header>
         <Content
           style={{
